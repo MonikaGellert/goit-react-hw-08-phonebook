@@ -1,0 +1,25 @@
+.contactsList {
+  font-family: Coiny;
+  min-width: 320px;
+  margin-top: 10px;
+  padding: 10px;
+  border: 2px solid rgb(36, 6, 156);
+  border-radius: 20px;
+  color: rgb(43, 9, 123);
+  overflow: hidden;
+}
+.title {
+  display: flex;
+  font-family: Coiny;
+  font-size: 24px;
+  font-weight: 400;
+  color: rgb(18, 11, 105);
+  justify-content: center;
+}
+
+@media screen and (min-width: 520px) {
+  .title {
+    justify-content: flex-start;
+    padding-left: 10px;
+  }
+}

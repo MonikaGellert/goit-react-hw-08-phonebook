@@ -1,41 +1,32 @@
-import { Box, TextField, Typography } from '@mui/material';
-import { useFilter } from '../../hooks/filterHook';
+import React from 'react';
+import { useDispatch } from 'react-redux';
+import { setFilter } from 'redux/filter/filterSlice';
+import { nanoid } from 'nanoid';
+import css from './Filter.module.css';
+import Input from 'styled/Input';
+import LabelContainer from 'styled/LabelContainer';
 
-export const Filter = () => {
-  const { filter, changeFilter } = useFilter();
+const Filter = () => {
+  const dispatch = useDispatch();
+  const filterId = nanoid();
+
+  const handleChange = event => {
+    dispatch(setFilter(event.currentTarget.value));
+  };
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-      sx={{
-        '& > :not(style)': { m: 2 },
-      }}
-    >
-      <Typography
-        style={{
-          fontSize: '35px',
-          fontWeight: 'bold',
-          lineHeight: '2.8',
-          marginBottom: '10px',
-        }}
-        variant="h3"
-      >
-        Contacts
-      </Typography>
-      <TextField
-        sx={{ width: '50ch' }}
-        type="text"
-        name="filter"
-        value={filter}
-        onChange={event => changeFilter(event.target.value)}
-        id="filled-basic"
-        label="Find contacts by name"
-        variant="filled"
-        required
-      />
-    </Box>
+    <div className={css.filter}>
+      <LabelContainer>
+        <label htmlFor={filterId}>Find contacts</label>
+        <Input
+          id={filterId}
+          type="search"
+          placeholder="Enter name"
+          onChange={event => handleChange(event)}
+        />
+      </LabelContainer>
+    </div>
   );
 };
+
+export default Filter;

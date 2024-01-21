@@ -1,0 +1,26 @@
+.wrapper {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.link {
+  display: inline-block;
+  text-decoration: none;
+  font-family: Coiny;
+  padding: 12px;
+  font-weight: 600;
+  font-size: 18px;
+  color: rgb(77, 75, 12);
+  transition-property: color;
+  transition-duration: 400ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.link.isActive {
+  color: rgb(64, 99, 64);
+}
+.link:hover,
+.link:focus {
+  color: rgb(45, 13, 134);
+}

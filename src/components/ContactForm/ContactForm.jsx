@@ -1,108 +1,84 @@
-import { useState } from 'react';
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import { Typography } from '@mui/material';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { nanoid } from 'nanoid';
+import { selectContacts } from 'redux/contacts/selectors';
+import { addContact } from '../../redux/contacts/operations';
 import {
-  useAddContactMutation,
-  useGetContactsQuery,
-} from 'redux/contactsSlice';
+  doubledContactNotification,
+  addedContactNotification,
+} from 'utils/notifications';
+import Button from 'styled/Button';
+import Input from 'styled/Input';
+import LabelContainer from 'styled/LabelContainer';
+import Form from 'styled/Form';
+import css from './ContactForm.module.css';
 
-export const ContactForm = () => {
-  const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
-  const { data: contacts } = useGetContactsQuery();
-  const [addContact] = useAddContactMutation();
+const ContactForm = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(selectContacts);
 
-  const onAddContact = contact => {
-    if (contacts && contacts.some(item => item.name === contact.name)) {
-      alert(`${contact.name} is already in contacts`);
-      return;
-    }
-    addContact(contact);
-  };
-
-  const onChangeInput = event => {
-    const { name, value } = event.target;
-    if (name === 'name') {
-      setName(value);
-    }
-    if (name === 'number') {
-      setNumber(value);
-    }
-  };
-
-  const onSubmitForm = event => {
+  const handleSubmit = event => {
     event.preventDefault();
+    const form = event.target;
 
-    if (name && number) {
-      onAddContact({
-        name,
-        number,
-      });
-    } else {
-      alert('The number field and name are empty, fill them in!');
+    let isContact;
+    contacts.forEach(person => {
+      if (form.name.value.toLowerCase() === person.name.toLowerCase()) {
+        isContact = true;
+      }
+    });
+    if (isContact) {
+      doubledContactNotification(form.name.value);
     }
-
-    reset(event);
+    if (!isContact) {
+      dispatch(
+        addContact({
+          name: form.name.value,
+          number: form.number.value,
+        })
+      );
+      addedContactNotification(form.name.value);
+    }
+    form.reset();
   };
 
-  const reset = event => {
-    setName('');
-    setNumber('');
-    event.currentTarget.reset();
-  };
+  const nameInputId = nanoid();
+  const numberInputId = nanoid();
 
   return (
-    <Box textAlign="center">
-      <Typography
-        style={{
-          fontSize: '40px',
-          fontWeight: 'bold',
-          lineHeight: '2.8',
-          marginBottom: '20px',
-        }}
-        variant="h3"
-      >
-        Phonebook
-      </Typography>
-      <Box
-        component="form"
-        display="flex"
-        justifyContent="center"
-        flexDirection="column"
-        sx={{
-          '& > :not(style)': { m: 1 },
-        }}
-        autoComplete="off"
-        onSubmit={onSubmitForm}
-      >
-        <TextField
-          sx={{ width: '50ch' }}
+    <Form className={css.formBox} onSubmit={handleSubmit}>
+      <LabelContainer>
+        <label className={css.label} htmlFor={nameInputId}>
+          Name
+        </label>
+        <Input
+          id={nameInputId}
           type="text"
           name="name"
-          onChange={onChangeInput}
-          id="filled-basic"
-          label="Name"
-          variant="filled"
+          placeholder="Enter name"
+          pattern="^[a-zA-Zа-яА-Я\u0104\u0105\u0106\u0107\u0118\u0119\u0141\u0142\u0143\u0144\u00D3\u00F3\u015A\u015B\u0179\u017A\u017B\u017C]+(([' \-][a-zA-Zа-яА-Я \u0104\u0105\u0106\u0107\u0118\u0119\u0141\u0142\u0143\u0144\u00D3\u00F3\u015A\u015B\u0179\u017A\u017B\u017C])?[a-zA-Zа-яА-Я \u0104\u0105\u0106\u0107\u0118\u0119\u0141\u0142\u0143\u0144\u00D3\u00F3\u015A\u015B\u0179\u017A\u017B\u017C]*)*$"
+          title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
           required
         />
-        <TextField
-          sx={{ width: '50ch' }}
-          value={number}
+      </LabelContainer>
+      <LabelContainer>
+        <label className={css.label} htmlFor={numberInputId}>
+          Number
+        </label>
+        <Input
+          id={numberInputId}
           type="tel"
           name="number"
-          id="filled-basic"
-          label="Number"
-          variant="filled"
-          onChange={onChangeInput}
+          placeholder="Enter number"
+          pattern="\+?\d{1,4}?[\-.\s]?\(?\d{1,3}?\)?[\-.\s]?\d{1,4}[\-.\s]?\d{1,4}[\-.\s]?\d{1,9}"
+          title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
           required
         />
-        <Button disabled={!name || !number} type="submit">
-          Add Contact
-        </Button>
-      </Box>
-    </Box>
+      </LabelContainer>
+      <Button type="submit" name="submit">
+        Add contact
+      </Button>
+    </Form>
   );
 };
+
+export default ContactForm;
